@@ -1,0 +1,135 @@
+# =============================================================================
+# 환경 설정
+# =============================================================================
+
+environment:
+  name: "industrial_facility"
+  
+  # 환경 크기
+  dimensions:
+    length: 50.0                # m
+    width: 30.0                 # m
+    height: 10.0                # m (2층 포함)
+
+  # 바닥면 설정
+  ground:
+    material: "concrete"
+    friction: 0.8
+    color: [0.5, 0.5, 0.5]
+
+# =============================================================================
+# 장애물 설정
+# =============================================================================
+
+obstacles:
+  # 정적 장애물
+  static:
+    - name: "box_1"
+      type: "box"
+      size: [1.0, 1.0, 1.0]
+      position: [5.0, 3.0, 0.5]
+      friction: 0.6
+      
+    - name: "cylinder_1"
+      type: "cylinder"
+      radius: 0.5
+      height: 2.0
+      position: [10.0, -2.0, 1.0]
+      friction: 0.6
+      
+    - name: "pallet_stack"
+      type: "box"
+      size: [1.2, 1.0, 0.5]
+      position: [8.0, 5.0, 0.25]
+      friction: 0.7
+
+  # 랜덤 장애물 생성 설정
+  random:
+    enabled: true
+    count: 10
+    types: ["box", "cylinder"]
+    size_range:
+      min: [0.3, 0.3, 0.3]
+      max: [1.5, 1.5, 2.0]
+    spawn_area:
+      x: [2.0, 45.0]
+      y: [-12.0, 12.0]
+      z: [0.0, 0.0]             # 바닥에 생성
+
+# =============================================================================
+# 2층 계단 설정
+# =============================================================================
+
+stairs:
+  enabled: true
+  
+  # 계단 위치
+  position: [20.0, 0.0, 0.0]
+  rotation: 0.0                 # degrees (Y축 기준)
+  
+  # 계단 파라미터
+  parameters:
+    step_count: 12              # 계단 수
+    step_height: 0.18           # 계단 높이 (m)
+    step_depth: 0.28            # 계단 깊이 (m)
+    step_width: 2.0             # 계단 너비 (m)
+    
+  # 난간
+  handrail:
+    enabled: true
+    height: 1.0                 # m
+    diameter: 0.05              # m
+    
+  # 물리 속성
+  physics:
+    friction: 0.9               # 높은 마찰력
+    restitution: 0.1            # 낮은 탄성
+
+# =============================================================================
+# 설비 및 QR 코드 배치
+# =============================================================================
+
+equipment:
+  - name: "pump_station_1"
+    type: "pump"
+    position: [15.0, 10.0, 0.0]
+    qr_code:
+      id: "PUMP001"
+      position_offset: [0.0, 0.5, 1.2]
+      
+  - name: "control_panel_1"
+    type: "panel"
+    position: [25.0, -8.0, 0.0]
+    qr_code:
+      id: "PANEL001"
+      position_offset: [0.0, 0.0, 1.5]
+      
+  - name: "valve_1"
+    type: "valve"
+    position: [30.0, 5.0, 0.0]
+    qr_code:
+      id: "VALVE001"
+      position_offset: [0.0, 0.2, 0.8]
+
+# =============================================================================
+# 조명 설정
+# =============================================================================
+
+lighting:
+  # 주 조명
+  main_light:
+    type: "dome"
+    intensity: 1000.0
+    color: [1.0, 1.0, 1.0]
+    
+  # 추가 조명
+  additional_lights:
+    - type: "rect"
+      position: [25.0, 0.0, 9.0]
+      intensity: 500.0
+      size: [10.0, 5.0]
+      
+  # Domain Randomization용 조명 범위
+  randomization:
+    intensity_range: [500, 2000]
+    color_temperature_range: [4000, 6500]  # Kelvin

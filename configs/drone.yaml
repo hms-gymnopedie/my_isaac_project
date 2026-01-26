@@ -1,0 +1,96 @@
+# =============================================================================
+# 드론 설정
+# =============================================================================
+
+drone:
+  # 기본 정보
+  name: "px4_drone"
+  type: "quadrotor"
+  
+  # URDF/USD 경로
+  model:
+    urdf_path: "assets/robots/drone/px4_drone.urdf"
+    usd_path: "assets/robots/drone/px4_drone.usd"
+  
+  # 물리 파라미터
+  physics:
+    mass: 1.5                   # 질량 (kg)
+    inertia: [0.01, 0.01, 0.02] # 관성 모멘트
+    drag_coefficient: 0.1       # 항력 계수
+    
+  # 모터 설정
+  motors:
+    count: 4
+    max_thrust: 10.0            # 최대 추력 (N)
+    max_rpm: 10000              # 최대 RPM
+    response_time: 0.05         # 응답 시간 (s)
+    
+  # 센서 설정
+  sensors:
+    imu:
+      enabled: true
+      rate: 200                 # Hz
+      noise:
+        accelerometer: 0.01     # m/s^2
+        gyroscope: 0.001        # rad/s
+    
+    gps:
+      enabled: true
+      rate: 10                  # Hz
+      noise: 0.5                # m
+      
+    barometer:
+      enabled: true
+      rate: 50                  # Hz
+      noise: 0.1                # m
+      
+    camera:
+      enabled: true
+      type: "rgbd"
+      resolution: [640, 480]
+      fov: 90
+
+# =============================================================================
+# 제어 파라미터
+# =============================================================================
+
+control:
+  # 위치 제어 PID
+  position:
+    kp: [5.0, 5.0, 5.0]
+    ki: [0.1, 0.1, 0.1]
+    kd: [2.0, 2.0, 2.0]
+    
+  # 속도 제어 PID
+  velocity:
+    kp: [2.0, 2.0, 2.0]
+    ki: [0.05, 0.05, 0.05]
+    kd: [0.5, 0.5, 0.5]
+    
+  # 자세 제어 PID
+  attitude:
+    kp: [8.0, 8.0, 4.0]
+    ki: [0.1, 0.1, 0.05]
+    kd: [2.0, 2.0, 1.0]
+
+  # 제어 제한
+  limits:
+    max_velocity: [5.0, 5.0, 3.0]       # m/s
+    max_acceleration: [3.0, 3.0, 2.0]   # m/s^2
+    max_tilt_angle: 30.0                # degrees
+    max_yaw_rate: 60.0                  # deg/s
+
+# =============================================================================
+# PX4 연동 설정
+# =============================================================================
+
+px4:
+  enabled: true
+  sitl_path: "/root/PX4-Autopilot"
+  vehicle: "iris"
+  world: "empty"
+  
+  # MAVLink 설정
+  mavlink:
+    udp_port: 14540
+    tcp_port: 4560

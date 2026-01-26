@@ -1,0 +1,112 @@
+# =============================================================================
+# 4족로봇 설정
+# =============================================================================
+
+quadruped:
+  # 기본 정보
+  name: "quadruped_robot"
+  type: "legged"
+  legs: 4
+  joints_per_leg: 3             # hip, thigh, calf
+  
+  # URDF/USD 경로
+  model:
+    urdf_path: "assets/robots/quadruped/quadruped.urdf"
+    usd_path: "assets/robots/quadruped/quadruped.usd"
+  
+  # 물리 파라미터
+  physics:
+    mass: 12.0                  # 질량 (kg)
+    height: 0.45                # 기본 높이 (m)
+    body_length: 0.4            # 몸체 길이 (m)
+    body_width: 0.2             # 몸체 너비 (m)
+    
+  # 다리 파라미터
+  leg:
+    hip_length: 0.08            # 힙 링크 길이 (m)
+    thigh_length: 0.213         # 대퇴부 길이 (m)
+    calf_length: 0.213          # 종아리 길이 (m)
+    
+  # 관절 제한
+  joint_limits:
+    hip:
+      min: -46.0                # degrees
+      max: 46.0
+    thigh:
+      min: -60.0
+      max: 240.0
+    calf:
+      min: -154.5
+      max: -52.5
+
+  # 센서 설정
+  sensors:
+    imu:
+      enabled: true
+      rate: 400                 # Hz
+      noise:
+        accelerometer: 0.02
+        gyroscope: 0.002
+        
+    joint_encoders:
+      enabled: true
+      rate: 500                 # Hz
+      noise: 0.001              # rad
+      
+    foot_force:
+      enabled: true
+      rate: 500                 # Hz
+      
+    camera:
+      enabled: true
+      type: "rgbd"
+      resolution: [640, 480]
+      fov: 80
+      position: [0.3, 0.0, 0.1] # 머리 위치
+
+# =============================================================================
+# 제어 파라미터
+# =============================================================================
+
+control:
+  # 보행 모드
+  gait:
+    default: "trot"             # trot, walk, gallop, bound
+    trot:
+      frequency: 2.5            # Hz
+      duty_factor: 0.5
+      phase_offset: [0, 0.5, 0.5, 0]  # FL, FR, RL, RR
+    walk:
+      frequency: 1.5
+      duty_factor: 0.75
+      phase_offset: [0, 0.5, 0.75, 0.25]
+      
+  # 관절 PD 제어
+  joint_pd:
+    kp: 50.0                    # Position gain
+    kd: 1.0                     # Velocity gain
+    
+  # 균형 제어
+  balance:
+    kp_position: [100, 100, 100]
+    kd_position: [10, 10, 10]
+    kp_orientation: [50, 50, 30]
+    kd_orientation: [5, 5, 3]
+
+  # 제어 제한
+  limits:
+    max_velocity: 1.5           # m/s
+    max_angular_velocity: 1.0   # rad/s
+    max_body_height: 0.5        # m
+    min_body_height: 0.2        # m
+
+# =============================================================================
+# 계단 등반 설정
+# =============================================================================
+
+stair_climbing:
+  enabled: true
+  max_step_height: 0.2          # 최대 계단 높이 (m)
+  detection_distance: 1.0       # 감지 거리 (m)
+  approach_speed: 0.3           # 접근 속도 (m/s)
+  climb_speed: 0.2              # 등반 속도 (m/s)
