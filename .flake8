@@ -1,0 +1,59 @@
+# =============================================================================
+# Flake8 Configuration
+# =============================================================================
+# 
+# Flake8은 빠르고 가벼운 Python 코드 스타일 검사 도구입니다.
+# 
+# 사용법:
+#   flake8 scripts/
+#   flake8 --statistics scripts/
+#
+# =============================================================================
+
+[flake8]
+# 최대 줄 길이 (black과 동일하게 설정)
+max-line-length = 100
+
+# 복잡도 제한 (McCabe complexity)
+max-complexity = 12
+
+# 무시할 에러 코드
+# E203: whitespace before ':' (black과 충돌)
+# E266: too many leading '#' for block comment
+# E501: line too long (black이 처리)
+# W503: line break before binary operator (black과 충돌)
+# W504: line break after binary operator
+extend-ignore = E203, E266, W503, W504
+
+# 검사할 에러 코드 선택
+select = B,C,E,F,W,T4,B9
+
+# 제외할 디렉토리/파일
+exclude =
+    .git,
+    __pycache__,
+    .mypy_cache,
+    .pytest_cache,
+    *.egg-info,
+    build,
+    dist,
+    venv,
+    .venv,
+    data/,
+    assets/,
+    docs/,
+    *.usd,
+    *.usda,
+    *.usdc
+
+# 파일당 최대 에러 수 (0 = 무제한)
+max-errors = 100
+
+# 통계 표시
+statistics = True
+
+# 소스 코드 표시
+show-source = True
+
+# 에러 개수 표시
+count = True

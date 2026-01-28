@@ -1,0 +1,160 @@
+# =============================================================================
+# Python Project Configuration (pyproject.toml)
+# =============================================================================
+#
+# 이 파일은 black, isort, pytest 등 여러 도구의 설정을 통합합니다.
+#
+# =============================================================================
+
+[project]
+name = "isaac-pegasus-project"
+version = "0.1.0"
+description = "Isaac Sim + Pegasus Simulator 기반 산업현장 드론/로봇 시뮬레이션"
+readme = "README.md"
+requires-python = ">=3.10"
+
+# =============================================================================
+# Black - 코드 포맷터
+# =============================================================================
+# 
+# 사용법:
+#   black scripts/
+#   black --check scripts/  (변경 없이 검사만)
+#   black --diff scripts/   (변경 내용 미리보기)
+#
+# =============================================================================
+
+[tool.black]
+line-length = 100
+target-version = ['py311']
+
+# 포함할 파일
+include = '\.pyi?$'
+
+# 제외할 디렉토리
+exclude = '''
+/(
+    \.git
+  | \.mypy_cache
+  | \.pytest_cache
+  | __pycache__
+  | build
+  | dist
+  | data
+  | assets
+  | docs
+  | \.venv
+  | venv
+)/
+'''
+
+# =============================================================================
+# isort - import 정렬
+# =============================================================================
+#
+# 사용법:
+#   isort scripts/
+#   isort --check-only scripts/  (변경 없이 검사만)
+#   isort --diff scripts/        (변경 내용 미리보기)
+#
+# =============================================================================
+
+[tool.isort]
+profile = "black"
+line_length = 100
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+
+# import 섹션 순서
+sections = [
+    "FUTURE",
+    "STDLIB",
+    "THIRDPARTY",
+    "ISAACSIM",
+    "FIRSTPARTY",
+    "LOCALFOLDER"
+]
+
+# Isaac Sim 관련 모듈을 별도 섹션으로
+known_isaacsim = [
+    "omni",
+    "isaacsim", 
+    "pxr",
+    "carb",
+    "pegasus"
+]
+known_first_party = ["scripts"]
+
+# 건너뛸 디렉토리
+skip = [
+    ".git",
+    "__pycache__",
+    "data",
+    "assets",
+    "docs",
+    ".venv",
+    "venv"
+]
+
+# =============================================================================
+# pytest - 테스트 프레임워크
+# =============================================================================
+#
+# 사용법:
+#   pytest
+#   pytest -v              (상세 출력)
+#   pytest --cov=scripts/  (커버리지 포함)
+#
+# =============================================================================
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]
+
+# 테스트 파일 패턴
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+# 추가 옵션
+addopts = [
+    "-ra",           # 요약에서 모든 실패/스킵 표시
+    "-q",            # 간결한 출력
+    "--strict-markers",
+]
+
+# 마커 정의
+markers = [
+    "slow: 느린 테스트 (deselect with '-m \"not slow\"')",
+    "integration: 통합 테스트",
+    "gpu: GPU 필요한 테스트",
+]
+
+# 경고 필터
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+]
+
+# =============================================================================
+# coverage - 테스트 커버리지
+# =============================================================================
+
+[tool.coverage.run]
+source = ["scripts"]
+omit = [
+    "*/tests/*",
+    "*/__init__.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
