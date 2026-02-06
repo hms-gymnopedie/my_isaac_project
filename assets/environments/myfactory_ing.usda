@@ -1,0 +1,338 @@
+#usda 1.0
+(
+defaultPrim = "World"
+metersPerUnit = 1.0
+upAxis = "Z"
+)
+
+def Scope "World"
+{
+# --- [재질 정의 섹션: Isaac Sim PBR 매핑 적용] ---
+def Scope "Looks"
+{
+def Material "Metal_Steel"
+{
+token outputs:surface.connect = </World/Looks/Metal_Steel/PBRShader.outputs:surface>
+
+        def Shader "PBRShader"
+        {
+            uniform token info:id = "UsdPreviewSurface"
+            color3f inputs:diffuseColor.connect = </World/Looks/Metal_Steel/DiffuseTexture.outputs:rgb>
+            float inputs:metallic = 1.0
+            float inputs:roughness.connect = </World/Looks/Metal_Steel/RoughnessTexture.outputs:r>
+            normal3f inputs:normal.connect = </World/Looks/Metal_Steel/NormalTexture.outputs:rgb>
+            token outputs:surface
+        }
+        def Shader "DiffuseTexture"
+        {
+            uniform token info:id = "UsdUVTexture"
+            asset inputs:file = @../textures/metal/Metal028_2K-PNG_Color.png@
+            float2 inputs:st.connect = </World/Looks/Metal_Steel/TexCoord.outputs:result>
+            token inputs:wrapS = "repeat"
+            token inputs:wrapT = "repeat"
+            float3 outputs:rgb
+        }
+        def Shader "RoughnessTexture"
+        {
+            uniform token info:id = "UsdUVTexture"
+            asset inputs:file = @../textures/metal/Metal028_2K-PNG_Roughness.png@
+            float2 inputs:st.connect = </World/Looks/Metal_Steel/TexCoord.outputs:result>
+            token inputs:wrapS = "repeat"
+            token inputs:wrapT = "repeat"
+            float outputs:r
+        }
+        def Shader "NormalTexture"
+        {
+            uniform token info:id = "UsdUVTexture"
+            asset inputs:file = @../textures/metal/Metal028_2K-PNG_NormalGL.png@
+            float2 inputs:st.connect = </World/Looks/Metal_Steel/TexCoord.outputs:result>
+            token inputs:wrapS = "repeat"
+            token inputs:wrapT = "repeat"
+            float3 outputs:rgb
+        }
+        def Shader "TexCoord"
+        {
+            uniform token info:id = "UsdPrimvarReader_float2"
+            string inputs:varname = "st"
+            float2 outputs:result
+        }
+    }
+
+    def Material "Wall_Concrete"
+    {
+        token outputs:surface.connect = </World/Looks/Wall_Concrete/PBRShader.outputs:surface>
+        def Shader "PBRShader"
+        {
+            uniform token info:id = "UsdPreviewSurface"
+            color3f inputs:diffuseColor = (0.7, 0.7, 0.6)
+            float inputs:metallic = 0.0
+            float inputs:roughness = 0.9
+            token outputs:surface
+        }
+    }
+
+    def Material "Floor_Concrete"
+    {
+        token outputs:surface.connect = </World/Looks/Floor_Concrete/PBRShader.outputs:surface>
+        def Shader "PBRShader"
+        {
+            uniform token info:id = "UsdPreviewSurface"
+            color3f inputs:diffuseColor.connect = </World/Looks/Floor_Concrete/DiffuseTexture.outputs:rgb>
+            float inputs:metallic = 0.0
+            float inputs:roughness.connect = </World/Looks/Floor_Concrete/RoughnessTexture.outputs:r>
+            normal3f inputs:normal.connect = </World/Looks/Floor_Concrete/NormalTexture.outputs:rgb>
+            token outputs:surface
+        }
+        def Shader "DiffuseTexture"
+        {
+            uniform token info:id = "UsdUVTexture"
+            asset inputs:file = @../textures/floor/Concrete022_2K-PNG_Color.png@
+            float2 inputs:st.connect = </World/Looks/Floor_Concrete/TexCoord.outputs:result>
+            token inputs:wrapS = "repeat"
+            token inputs:wrapT = "repeat"
+            float3 outputs:rgb
+        }
+        def Shader "RoughnessTexture"
+        {
+            uniform token info:id = "UsdUVTexture"
+            asset inputs:file = @../textures/floor/Concrete022_2K-PNG_Roughness.png@
+            float2 inputs:st.connect = </World/Looks/Floor_Concrete/TexCoord.outputs:result>
+            token inputs:wrapS = "repeat"
+            token inputs:wrapT = "repeat"
+            float outputs:r
+        }
+        def Shader "NormalTexture"
+        {
+            uniform token info:id = "UsdUVTexture"
+            asset inputs:file = @../textures/floor/Concrete022_2K-PNG_NormalGL.png@
+            float2 inputs:st.connect = </World/Looks/Floor_Concrete/TexCoord.outputs:result>
+            token inputs:wrapS = "repeat"
+            token inputs:wrapT = "repeat"
+            float3 outputs:rgb
+        }
+        def Shader "TexCoord"
+        {
+            uniform token info:id = "UsdPrimvarReader_float2"
+            string inputs:varname = "st"
+            float2 outputs:result
+        }
+    }
+    
+    def Material "Motor_Paint"
+    {
+        token outputs:surface.connect = </World/Looks/Motor_Paint/PBRShader.outputs:surface>
+        def Shader "PBRShader"
+        {
+            uniform token info:id = "UsdPreviewSurface"
+            color3f inputs:diffuseColor = (0.1, 0.3, 0.6)
+            float inputs:metallic = 0.5
+            float inputs:roughness = 0.4
+            token outputs:surface
+        }
+    }
+}
+
+# --- [조명 섹션] ---
+def DistantLight "MainLight"
+{
+    float inputs:intensity = 2000
+    color3f inputs:color = (1, 1, 1)
+    double3 xformOp:rotateXYZ = (45, -20, 45)
+    uniform token[] xformOpOrder = ["xformOp:rotateXYZ"]
+}
+
+# --- [환경 배치 섹션] ---
+def Scope "Environment"
+{
+    # 1층 바닥
+    def Cube "Floor_1F"
+    {
+        rel material:binding = </World/Looks/Floor_Concrete>
+        double3 xformOp:scale = (30, 30, 0.01)
+        double3 xformOp:translate = (15, 15, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+    }
+
+    # 2층 바닥 (5.0m 높이)
+    def Cube "Floor_2F"
+    {
+        rel material:binding = </World/Looks/Floor_Concrete>
+        double3 xformOp:scale = (30, 30, 0.05)
+        double3 xformOp:translate = (15, 15, 5.0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+    }
+
+    # --- [1층 구조물: 층고 5m 적용] ---
+    def Scope "Level_1F"
+    {
+        def Scope "Walls"
+        {
+            rel material:binding = </World/Looks/Wall_Concrete>
+            
+            # 입구 통로 벽 (Vertical)
+            def Cube "Wall_Entrance_L" {
+                double3 xformOp:scale = (0.1, 5, 2.5)
+                double3 xformOp:translate = (-1.5, 5, 2.5)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+            def Cube "Wall_Entrance_R" {
+                double3 xformOp:scale = (0.1, 3.5, 2.5)
+                double3 xformOp:translate = (1.5, 3.5, 2.5)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+            
+            # 첫번째 가로 복도 (Horizontal)
+            def Cube "Wall_H1_Outer" {
+                double3 xformOp:scale = (7.5, 0.1, 2.5)
+                double3 xformOp:translate = (6, 10, 2.5)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+            def Cube "Wall_H1_Inner" {
+                double3 xformOp:scale = (6, 0.1, 2.5)
+                double3 xformOp:translate = (7.5, 7, 2.5)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            # 두번째 세로 복도 (Vertical)
+            def Cube "Wall_V2_L" {
+                double3 xformOp:scale = (0.1, 5, 2.5)
+                double3 xformOp:translate = (13.5, 15, 2.5)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+            def Cube "Wall_V2_R" {
+                double3 xformOp:scale = (0.1, 6.5, 2.5)
+                double3 xformOp:translate = (16.5, 13.5, 2.5)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+        }
+
+        def Scope "Motors"
+        {
+            rel material:binding = </World/Looks/Motor_Paint>
+            def Cube "Motor_01" {
+                double3 xformOp:scale = (0.6, 0.4, 0.5)
+                double3 xformOp:translate = (20, 23.5, 0.5)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+            def Cube "Motor_02" {
+                double3 xformOp:scale = (0.6, 0.4, 0.5)
+                double3 xformOp:translate = (23, 23.5, 0.5)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+            def Cube "Motor_03" {
+                double3 xformOp:scale = (0.6, 0.4, 0.5)
+                double3 xformOp:translate = (26, 23.5, 0.5)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+        }
+    }
+
+    # --- [2층 구조물: 층고 5m 위로 오프셋] ---
+    def Scope "Level_2F"
+    {
+        def Scope "Walls"
+        {
+            rel material:binding = </World/Looks/Wall_Concrete>
+            def Cube "Wall_Entrance_L" {
+                double3 xformOp:scale = (0.1, 5, 2.5)
+                double3 xformOp:translate = (-1.5, 5, 7.5)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+        }
+        def Scope "Motors"
+        {
+            rel material:binding = </World/Looks/Motor_Paint>
+            def Cube "Motor_01" {
+                double3 xformOp:scale = (0.6, 0.4, 0.5)
+                double3 xformOp:translate = (20, 23.5, 5.5)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+        }
+    }
+
+    # --- [계단 구조: 계단참(Landing) 포함] ---
+    def Scope "StairCase"
+    {
+        rel material:binding = </World/Looks/Metal_Steel>
+        
+        # Flight 1: 0m -> 2.5m (계단참까지)
+        def Scope "Flight_1"
+        {
+            def Cube "Step_0"
+            {
+                double3 xformOp:translate = (28, 25.0, 0.1)
+                double3 xformOp:scale = (1.5, 0.2, 0.1)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+            def Cube "Step_5"
+            {
+                double3 xformOp:translate = (28, 26.0, 1.1)
+                double3 xformOp:scale = (1.5, 0.2, 0.1)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+            def Cube "Step_11"
+            {
+                double3 xformOp:translate = (28, 27.2, 2.3)
+                double3 xformOp:scale = (1.5, 0.2, 0.1)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+        }
+
+        # 계단참 (Landing): 2.5m 지점의 평면 플랫폼
+        def Cube "Landing_Platform"
+        {
+            double3 xformOp:scale = (1.5, 1.5, 0.05)
+            double3 xformOp:translate = (28, 28.5, 2.5)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+
+        # Flight 2: 2.5m -> 5.0m (계단참에서 2층까지)
+        def Scope "Flight_2"
+        {
+            def Cube "Step_13"
+            {
+                double3 xformOp:translate = (28, 29.5, 2.7)
+                double3 xformOp:scale = (1.5, 0.2, 0.1)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+            def Cube "Step_18"
+            {
+                double3 xformOp:translate = (28, 30.5, 3.7)
+                double3 xformOp:scale = (1.5, 0.2, 0.1)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+            def Cube "Step_24"
+            {
+                double3 xformOp:translate = (28, 31.7, 4.9)
+                double3 xformOp:scale = (1.5, 0.2, 0.1)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+            def Cube "Step_Final"
+            {
+                double3 xformOp:translate = (28, 32.0, 5.0)
+                double3 xformOp:scale = (1.5, 0.2, 0.05)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+        }
+    }
+}
+
+# --- [CCTV 카메라 섹션] ---
+def Scope "Cameras"
+{
+    def Camera "CCTV_1F_Entrance"
+    {
+        double3 xformOp:translate = (-1.4, 9.9, 4.8)
+        double3 xformOp:rotateXYZ = (-30, 0, 45)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+    }
+    def Camera "CCTV_Landing_View"
+    {
+        double3 xformOp:translate = (30, 28.5, 4.0)
+        double3 xformOp:rotateXYZ = (-45, 0, -90)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+    }
+}
+
+
+}

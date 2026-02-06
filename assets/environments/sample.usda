@@ -1,0 +1,117 @@
+#usda 1.0
+(
+    defaultPrim = "World"
+    metersPerUnit = 1.0
+    upAxis = "Z"
+)
+
+def Xform "World"
+{
+    # 1. 물리 씬 정의 (Physics Scene) - Isaac Sim 필수 요소
+    def PhysicsScene "PhysicsScene"
+    {
+        uniform token gravityDirection = "Z"
+        uniform float3 gravityMagnitude = (0, 0, -9.81)
+    }
+
+    # 2. 바닥 (공장 플로어)
+    def Cube "Factory_Floor" (
+        prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsRigidBodyAPI"]
+    )
+    {
+        double size = 20.0
+        float3 xformOp:scale = (2.0, 2.0, 0.05)
+        double3 xformOp:translate = (0, 0, -0.025)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        color3f[] primvars:displayColor = [(0.3, 0.3, 0.35)]
+    }
+
+    # 3. 설비 1: 대형 환기팬 (Animated)
+    def Xform "Ventilation_Fan" (
+        prepend apiSchemas = ["SemanticsAPI"]
+    )
+    {
+        string semantic:Semantics:type = "class"
+        string semantic:Semantics:data = "Industrial_Fan"
+
+        double3 xformOp:translate = (0, 5, 2.5)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+
+        # 팬 하우징 (외관)
+        def Cylinder "Housing"
+        {
+            double height = 0.5
+            double radius = 1.6
+            token axis = "Y"
+            color3f[] primvars:displayColor = [(0.1, 0.1, 0.1)]
+            
+            # 충돌체 설정 (LiDAR 인식용)
+            def PhysicsCollisionAPI "Collision" {}
+        }
+
+        # 회전하는 날개 (Blades)
+        def Xform "Blades"
+        {
+            # 간단한 회전 애니메이션 (0프레임 0도 -> 100프레임 360도)
+            float xformOp:rotateY.timeSamples = {
+                0: 0,
+                100: 360,
+                200: 720
+            }
+            uniform token[] xformOpOrder = ["xformOp:rotateY"]
+
+            def Cube "Blade_1"
+            {
+                double size = 1.0
+                float3 xformOp:scale = (0.2, 0.1, 2.8)
+                color3f[] primvars:displayColor = [(0.8, 0.6, 0.0)]
+            }
+            def Cube "Blade_2"
+            {
+                double size = 1.0
+                float3 xformOp:scale = (2.8, 0.1, 0.2)
+                color3f[] primvars:displayColor = [(0.8, 0.6, 0.0)]
+            }
+        }
+    }
+
+    # 4. 설비 2: 고출력 모터 (Inspection Target)
+    def Xform "Heavy_Motor" (
+        prepend apiSchemas = ["SemanticsAPI"]
+    )
+    {
+        string semantic:Semantics:type = "class"
+        string semantic:Semantics:data = "Electric_Motor"
+
+        double3 xformOp:translate = (4, 0, 0.5)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+
+        # 모터 본체
+        def Cylinder "Body"
+        {
+            double height = 1.2
+            double radius = 0.6
+            token axis = "X"
+            color3f[] primvars:displayColor = [(0.1, 0.2, 0.6)]
+            
+            def PhysicsCollisionAPI "Collision" {}
+        }
+
+        # 모터 베이스
+        def Cube "Base"
+        {
+            double size = 1.0
+            float3 xformOp:scale = (1.5, 1.0, 0.2)
+            double3 xformOp:translate = (0, 0, -0.7)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            color3f[] primvars:displayColor = [(0.2, 0.2, 0.2)]
+        }
+    }
+
+    # 5. UAV 시작 위치 (Start Point)
+    def Xform "UAV_Start_Location"
+    {
+        double3 xformOp:translate = (-5, 0, 0.5)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+}

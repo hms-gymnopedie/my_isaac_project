@@ -1,0 +1,100 @@
+#usda 1.0
+(
+    metersPerUnit = 1
+    upAxis = "Z"
+)
+
+def Xform "World"
+{
+    def Xform "Environment"
+    {
+        def Xform "Floor"
+        {
+            def Cube "floor_mesh"
+            {
+                double3 xformOp:scale = (50, 30, 0.1)
+                double3 xformOp:translate = (25, 0, -0.05)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+        }
+
+        def Xform "Walls"
+        {
+            def Cube "wall_north"
+            {
+                double3 xformOp:scale = (50, 0.2, 4)
+                double3 xformOp:translate = (25, 15, 2)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "wall_south"
+            {
+                double3 xformOp:scale = (50, 0.2, 4)
+                double3 xformOp:translate = (25, -15, 2)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "wall_east"
+            {
+                double3 xformOp:scale = (0.2, 30, 4)
+                double3 xformOp:translate = (50, 0, 2)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "wall_west"
+            {
+                double3 xformOp:scale = (0.2, 30, 4)
+                double3 xformOp:translate = (0, 0, 2)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+        }
+
+        def Xform "Zones"
+        {
+            def Xform "Zone_Loading"
+            {
+                double3 xformOp:translate = (10, 10, 0)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+            }
+
+            def Xform "Zone_Processing"
+            {
+                double3 xformOp:translate = (25, 0, 0)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+            }
+
+            def Xform "Zone_Storage"
+            {
+                double3 xformOp:translate = (40, -8, 0)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+            }
+        }
+
+        def Xform "StairsAnchor"
+        {
+            double3 xformOp:translate = (20, 0, 0)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Xform "EquipmentAnchors"
+        {
+            def Xform "pump_station_1_anchor"
+            {
+                double3 xformOp:translate = (15, 10, 0)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+            }
+
+            def Xform "control_panel_1_anchor"
+            {
+                double3 xformOp:translate = (25, -8, 0)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+            }
+
+            def Xform "valve_1_anchor"
+            {
+                double3 xformOp:translate = (30, 5, 0)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+            }
+        }
+    }
+}
