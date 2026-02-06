@@ -19,7 +19,8 @@ import os
 # 0. Parse Arguments FIRST (for SimulationApp config)
 # We use a separate parser or parse_known_args to avoid conflicts with Kit args later if needed
 parser = argparse.ArgumentParser(description="Run Drone SLAM Simulation")
-parser.add_argument("--map", type=str, choices=["warehouse", "custom"], default="warehouse", help="Map to load")
+parser.add_argument("--map", type=str, default="warehouse", 
+                    help="Map name (default: warehouse). Put maps in assets/environments/")
 parser.add_argument("--headless", action="store_true", help="Run in headless mode (no GUI window)")
 parser.add_argument("--webrtc", action="store_true", help="Enable WebRTC streaming")
 args, unknown_args = parser.parse_known_args()
@@ -81,27 +82,47 @@ def main():
     world = World(stage_units_in_meters=1.0)
 
     # 5. Load Map
+    # Maps directory in container
+    maps_dir = "/workspace/assets/environments"
+    
     if args.map == "warehouse":
-        # Load standard Isaac Sim Warehouse
-        usd_path = "/Isaac/Environments/Simple_Warehouse/warehouse.usd" 
-        # Note: In a real env, verify this path. For now assume standard asset path.
-        # If asset server is not connected, this might fail.
-        # Alternative: use a local empty stage and build simple walls.
+        # Try Nucleus path first, fallback to local or ground plane
+        usd_path = "/Isaac/Environments/Simple_Warehouse/warehouse.usd"
         try:
-            # Try open_stage first (for absolute/nucleu paths)
             open_stage(usd_path)
+            carb.log_info(f"Loaded Nucleus warehouse: {usd_path}")
         except Exception:
-            # Fallback for testing: Simple Plane
-            world.scene.add_default_ground_plane()
-            carb.log_warn(f"Could not load {usd_path}. Loaded default ground plane.")
-            
-    elif args.map == "custom":
-        usd_path = "/workspace/assets/environments/260202_my_factory_withCameras.usda"
-        if os.path.exists(usd_path):
+            # Check if local warehouse exists
+            local_warehouse = f"{maps_dir}/warehouse.usd"
+            if os.path.exists(local_warehouse):
+                open_stage(local_warehouse)
+                carb.log_info(f"Loaded local warehouse: {local_warehouse}")
+            else:
+                world.scene.add_default_ground_plane()
+                carb.log_warn(f"Warehouse not found. Using default ground plane.")
+    else:
+        # Try to find map file in assets/environments/
+        # Accept: "my_map" or "my_map.usd" or "my_map.usda"
+        map_name = args.map
+        possible_paths = [
+            f"{maps_dir}/{map_name}",
+            f"{maps_dir}/{map_name}.usd",
+            f"{maps_dir}/{map_name}.usda",
+        ]
+        
+        usd_path = None
+        for path in possible_paths:
+            if os.path.exists(path):
+                usd_path = path
+                break
+        
+        if usd_path:
             open_stage(usd_path)
-            carb.log_info(f"Loaded custom map: {usd_path}")
+            carb.log_info(f"Loaded map: {usd_path}")
         else:
-            carb.log_error(f"Custom map not found at {usd_path}")
+            carb.log_error(f"Map not found: {map_name}")
+            carb.log_error(f"Searched in: {maps_dir}")
+            carb.log_error("Available maps: " + str(os.listdir(maps_dir) if os.path.exists(maps_dir) else "Directory not found"))
             sys.exit(1)
 
 
